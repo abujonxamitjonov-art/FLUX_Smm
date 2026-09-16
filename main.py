@@ -2,10 +2,6 @@
 import asyncio
 import logging
 import time
-import os
-
-from flask import Flask
-from threading import Thread
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
@@ -16,48 +12,11 @@ from config import BOT_TOKEN, ADMIN_ID
 from database import db
 from texts import t
 
-from handlers import (
-    user,
-    services,
-    numbers,
-    premium_stars_gifts,
-    manual_orders,
-    topup,
-    orders,
-    referral,
-    partnership,
-    admin,
-)
+from handlers import user, services, numbers, premium_stars_gifts, manual_orders, topup, orders, referral, admin
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
-# ============================================================
-# Render Web Service uchun oddiy HTTP server
-# ============================================================
-
-app = Flask(__name__)
-
-
-@app.route("/")
-def home():
-    return "Bot is running!"
-
-
-@app.route("/health")
-def health():
-    return "OK"
-
-
-def run_web_server():
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port, use_reloader=False)
-
-
-# ============================================================
-# Foydalanuvchilarni blokdan chiqarish watcher
-# ============================================================
 
 async def unblock_watcher(bot: Bot):
     """Blok muddati tugagan foydalanuvchilarni tekshirib, ularga xabar beradi."""
@@ -66,146 +25,68 @@ async def unblock_watcher(bot: Bot):
         try:
             conn = db.get_db()
             cur = await conn.execute(
-                "SELECT user_id, language FROM users "
-                "WHERE is_blocked=1 AND blocked_until>0 AND blocked_until<=?",
+                "SELECT user_id, language FROM users WHERE is_blocked=1 AND blocked_until>0 AND blocked_until<=?",
                 (int(time.time()),),
             )
             rows = await cur.fetchall()
-
             for user_id, lang in rows:
                 await db.unblock_user(user_id)
-
                 try:
-                    await bot.send_message(
-                        user_id,
-                        t(lang or "uz", "unblocked_msg")
-                    )
+                    await bot.send_message(user_id, t(lang or "uz", "unblocked_msg"))
                 except Exception:
                     pass
-
         except Exception as e:
             logger.exception("unblock_watcher xatosi: %s", e)
 
-
-# ============================================================
-# Har 24 soatda faoliyat eslatmasi
-# ============================================================
 
 async def active_reminder_task(bot: Bot):
     """Har 24 soatda oddiy foydalanuvchilarga bot faolligi haqida xabar."""
     while True:
         await asyncio.sleep(24 * 3600)
-
         try:
             user_ids = await db.get_all_user_ids()
-
             for uid in user_ids:
                 if uid == ADMIN_ID:
                     continue
-
                 try:
                     user_row = await db.get_user(uid)
                     lang = user_row["language"] if user_row else "uz"
-
-                    await bot.send_message(
-                        uid,
-                        t(lang, "active_reminder")
-                    )
-
+                    await bot.send_message(uid, t(lang, "active_reminder"))
                 except Exception:
                     pass
-
-                await asyncio.sleep(0.05)
-
+                await asyncio.sleep(0.05)  # flood limitga tushmaslik uchun
         except Exception as e:
             logger.exception("active_reminder_task xatosi: %s", e)
 
 
-# ============================================================
-# Telegram komandalar
-# ============================================================
-
 async def set_admin_commands(bot: Bot):
-    default_commands = [
-        BotCommand(
-            command="start",
-            description="Botni ishga tushirish"
-        )
-    ]
-
-    await bot.set_my_commands(
-        default_commands,
-        scope=BotCommandScopeDefault()
-    )
+    default_commands = [BotCommand(command="start", description="Botni ishga tushirish")]
+    await bot.set_my_commands(default_commands, scope=BotCommandScopeDefault())
 
     admin_commands = default_commands + [
-        BotCommand(
-            command="admin",
-            description="Admin buyruqlari ro'yxati"
-        ),
-        BotCommand(
-            command="stats",
-            description="Statistika"
-        ),
-        BotCommand(
-            command="broadcast",
-            description="Barchaga xabar yuborish"
-        ),
-        BotCommand(
-            command="add_channel",
-            description="Majburiy kanal qo'shish"
-        ),
-        BotCommand(
-            command="list_channels",
-            description="Majburiy kanallar ro'yxati"
-        ),
-        BotCommand(
-            command="remove_channel",
-            description="Majburiy kanalni o'chirish"
-        ),
-        BotCommand(
-            command="set_smm_margin",
-            description="SMM margin sozlash"
-        ),
-        BotCommand(
-            command="set_number_margin",
-            description="Nomer olish margin sozlash"
-        ),
-        BotCommand(
-            command="user",
-            description="Foydalanuvchi ma'lumoti"
-        ),
+        BotCommand(command="admin", description="Admin buyruqlari ro'yxati"),
+        BotCommand(command="stats", description="Statistika"),
+        BotCommand(command="broadcast", description="Barchaga xabar yuborish"),
+        BotCommand(command="add_channel", description="Majburiy kanal qo'shish"),
+        BotCommand(command="list_channels", description="Majburiy kanallar ro'yxati"),
+        BotCommand(command="remove_channel", description="Majburiy kanalni o'chirish"),
+        BotCommand(command="set_smm_margin", description="SMM margin sozlash"),
+        BotCommand(command="set_number_margin", description="Nomer olish margin sozlash"),
+        BotCommand(command="user", description="Foydalanuvchi ma'lumoti"),
     ]
-
     try:
-        await bot.set_my_commands(
-            admin_commands,
-            scope=BotCommandScopeChat(chat_id=ADMIN_ID)
-        )
+        await bot.set_my_commands(admin_commands, scope=BotCommandScopeChat(chat_id=ADMIN_ID))
     except Exception:
-        pass
+        pass  # admin hali botga /start bosmagan bo'lishi mumkin
 
-
-# ============================================================
-# Telegram bot
-# ============================================================
 
 async def main():
     if not BOT_TOKEN:
-        raise RuntimeError(
-            "BOT_TOKEN environment variable topilmadi! "
-            "Render'da sozlang."
-        )
+        raise RuntimeError("BOT_TOKEN environment variable topilmadi! Render'da sozlang.")
 
     await db.init_db()
 
-    bot = Bot(
-        token=BOT_TOKEN,
-        default=DefaultBotProperties(
-            parse_mode=ParseMode.HTML
-        )
-    )
-
+    bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     dp = Dispatcher()
 
     dp.include_router(admin.router)
@@ -217,7 +98,6 @@ async def main():
     dp.include_router(topup.router)
     dp.include_router(orders.router)
     dp.include_router(referral.router)
-    dp.include_router(partnership.router)
 
     await set_admin_commands(bot)
 
@@ -225,23 +105,9 @@ async def main():
     asyncio.create_task(active_reminder_task(bot))
 
     await bot.delete_webhook(drop_pending_updates=True)
-
     logger.info("Bot ishga tushdi...")
-
     await dp.start_polling(bot)
 
 
-# ============================================================
-# Bir vaqtda Web Server + Telegram bot
-# ============================================================
-
 if __name__ == "__main__":
-    # Render portni tekshirishi uchun HTTP serverni alohida thread'da ishga tushiramiz
-    web_thread = Thread(
-        target=run_web_server,
-        daemon=True
-    )
-    web_thread.start()
-
-    # Telegram botni ishga tushiramiz
     asyncio.run(main())

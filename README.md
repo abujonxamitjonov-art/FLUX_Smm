@@ -70,7 +70,6 @@ smmbot/
 │   ├── topup.py                     # Hisob to'ldirish
 │   ├── orders.py                     # Buyurtmalarim
 │   ├── referral.py                    # Referal bonus
-│   ├── partnership.py                  # Hamkorlik (API)
 │   └── admin.py                         # Admin panel
 ├── keyboards/                              # Barcha inline klaviaturalar
 └── utils/

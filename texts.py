@@ -18,15 +18,14 @@ TEXTS = {
         "main_menu": "🏠 Asosiy menyu. Kerakli bo'limni tanlang:",
         "blocked": "⛔️ Siz vaqtinchalik bloklangansiz. Iltimos keyinroq urinib ko'ring.",
         # Asosiy menyu
-        "btn_number": "📱 Nomer olish",
-        "btn_services": "🛍 Xizmatlar",
-        "btn_my_orders": "📦 Buyurtmalarim",
-        "btn_balance": "💰 Hisobim",
-        "btn_referral": "🔗 Referal bonus",
-        "btn_topup": "💳 Hisob to'ldirish",
-        "btn_guide": "📖 Qo'llanma",
-        "btn_partnership": "🤝 Hamkorlik (API)",
-        "btn_support": "☎️ Qo'llab-quvvatlash",
+        "btn_number": "Nomer olish",
+        "btn_services": "Xizmatlar",
+        "btn_my_orders": "Buyurtmalarim",
+        "btn_balance": "Hisobim",
+        "btn_referral": "Referal bonus",
+        "btn_topup": "Hisob to'ldirish",
+        "btn_guide": "Qo'llanma",
+        "btn_support": "Qo'llab-quvvatlash",
         "btn_back": "🔙 Orqaga",
         "btn_cancel": "❌ Bekor qilish",
         "btn_confirm": "✅ Tasdiqlash",
@@ -134,12 +133,6 @@ TEXTS = {
             "4️⃣ Buyurtmangiz holatini \"Buyurtmalarim\" bo'limida kuzatib boring\n\n"
             "❓ Savol bo'lsa, Qo'llab-quvvatlash bo'limiga murojaat qiling."
         ),
-        # Hamkorlik
-        "partnership_info": (
-            "🤝 Hamkorlik (API)\n\n"
-            "🛍 SMM xizmatlari uchun API: `{smm_url}`\n"
-            "📱 Nomer olish uchun API: `{number_url}`"
-        ),
         "btn_get_api_key": "🔑 API kalit olish",
         "btn_show_api_key": "👁 API kalitni ko'rish",
         "btn_regenerate_key": "🔄 Kalitni o'zgartirish",
@@ -173,15 +166,14 @@ TEXTS = {
         "subscribe_not_done": "❗️ Вы ещё не подписались на все каналы.",
         "main_menu": "🏠 Главное меню. Выберите нужный раздел:",
         "blocked": "⛔️ Вы временно заблокированы. Попробуйте позже.",
-        "btn_number": "📱 Получить номер",
-        "btn_services": "🛍 Услуги",
-        "btn_my_orders": "📦 Мои заказы",
-        "btn_balance": "💰 Мой баланс",
-        "btn_referral": "🔗 Реферальный бонус",
-        "btn_topup": "💳 Пополнить баланс",
-        "btn_guide": "📖 Инструкция",
-        "btn_partnership": "🤝 Партнёрство (API)",
-        "btn_support": "☎️ Поддержка",
+        "btn_number": "Получить номер",
+        "btn_services": "Услуги",
+        "btn_my_orders": "Мои заказы",
+        "btn_balance": "Мой баланс",
+        "btn_referral": "Реферальный бонус",
+        "btn_topup": "Пополнить баланс",
+        "btn_guide": "Инструкция",
+        "btn_support": "Поддержка",
         "btn_back": "🔙 Назад",
         "btn_cancel": "❌ Отмена",
         "btn_confirm": "✅ Подтвердить",
@@ -281,11 +273,6 @@ TEXTS = {
             "3️⃣ Выберите нужную услугу и оформите заказ\n"
             "4️⃣ Следите за статусом заказа в разделе \"Мои заказы\"\n\n"
             "❓ Если есть вопросы, обратитесь в раздел Поддержка."
-        ),
-        "partnership_info": (
-            "🤝 Партнёрство (API)\n\n"
-            "🛍 API для SMM-услуг: `{smm_url}`\n"
-            "📱 API для получения номеров: `{number_url}`"
         ),
         "btn_get_api_key": "🔑 Получить API-ключ",
         "btn_show_api_key": "👁 Показать API-ключ",
