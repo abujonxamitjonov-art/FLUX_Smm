@@ -2,6 +2,9 @@
 import asyncio
 import logging
 import time
+import os
+from threading import Thread
+from flask import Flask
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
@@ -16,6 +19,20 @@ from handlers import user, services, numbers, premium_stars_gifts, manual_orders
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+app = Flask(__name__)
+
+@app.get('/')
+def health_root():
+    return 'Bot is running!'
+
+@app.get('/health')
+def health():
+    return 'OK'
+
+def run_web_server():
+    port = int(os.getenv('PORT', '10000'))
+    app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
 
 
 async def unblock_watcher(bot: Bot):
@@ -72,6 +89,7 @@ async def set_admin_commands(bot: Bot):
         BotCommand(command="remove_channel", description="Majburiy kanalni o'chirish"),
         BotCommand(command="set_smm_margin", description="SMM margin sozlash"),
         BotCommand(command="set_number_margin", description="Nomer olish margin sozlash"),
+        BotCommand(command="add_number", description="Manual nomer qo'shish"),
         BotCommand(command="user", description="Foydalanuvchi ma'lumoti"),
     ]
     try:
@@ -81,6 +99,7 @@ async def set_admin_commands(bot: Bot):
 
 
 async def main():
+    Thread(target=run_web_server, daemon=True).start()
     if not BOT_TOKEN:
         raise RuntimeError("BOT_TOKEN environment variable topilmadi! Render'da sozlang.")
 
